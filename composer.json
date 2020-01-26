@@ -29,11 +29,15 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Quadram\\LaravelPassport\\Providers\\LaravelPassportServiceProvider"
+                "Laravel\\Passport\\PassportServiceProvider",
+                "Laravel\\Passport\\LaravelPassportAuthServiceProvider"
             ],
             "aliases": {
                 "LaravelPassport": "Quadram\\LaravelPassport\\Facade"
             }
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
