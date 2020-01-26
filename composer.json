@@ -1,6 +1,6 @@
 {
     "name": "quadram/laravel-passport",
-    "description": "This package install Laravel Passport library and gives you some usefull resources to issue expiring and not expiring tokens for your users",
+    "description": "This package install Laravel Passport library and gives you some useful resources to issue expiring and not expiring tokens for your users",
     "type": "library",
     "require-dev": {
         "orchestra/testbench": "^5.0@dev"
@@ -13,5 +13,7 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "laravel/passport": "^9.0@dev"
+    }
 }
