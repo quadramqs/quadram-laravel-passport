@@ -19,13 +19,13 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-        if (!$this->setUpHasRunOnce) {
+//        if (!$this->setUpHasRunOnce) {
             $this->clearCache();
 
             $this->runMigrations();
 
             $this->setUpHasRunOnce = true;
-        }
+//        }
     }
 
     public function runMigrations()
@@ -47,6 +47,7 @@ abstract class TestCase extends Orchestra
 
     public function clearCache()
     {
+        $this->artisan('config:clear');
         foreach (glob(__DIR__ . '/../bootstrap/cache{,t}/*.php', GLOB_BRACE) as $file) {
             unlink($file);
         }
@@ -78,5 +79,21 @@ abstract class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        $refl = new \ReflectionObject($this);
+        foreach ($refl->getProperties() as $prop) {
+            if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
+                $prop->setAccessible(true);
+                $prop->setValue($this, null);
+            }
+        }
+    }
+
+    protected function getBasePath()
+    {
+        return __DIR__.'/../vendor/orchestra/testbench-core/laravel';
     }
 }

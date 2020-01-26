@@ -22,6 +22,14 @@ class LaravelPassportServiceProvider extends ServiceProvider
         $this->commands([
             InstallCommand::class
         ]);
+
+//        if ($this->app->runningInConsole()) {
+//            if (!class_exists('CreateUsersLPTable')) {
+//                $this->publishes([
+//                    __DIR__ . '/../database/migrations/create_users_table.stub' => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_users_table.php'),
+//                ], 'migrations');
+//            }
+//        }
     }
 
 

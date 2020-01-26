@@ -6,11 +6,10 @@ namespace Quadram\LaravelPassport\Traits;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
 
 trait LaravelPassportTrait
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens;
 
     public $authorization;
 
@@ -22,7 +21,7 @@ trait LaravelPassportTrait
      */
     public function findForPassport($username)
     {
-        return $this->where('username', $username)->first();
+        return $this->where('email', $username)->first();
     }
 
     /**
@@ -36,6 +35,11 @@ trait LaravelPassportTrait
         return Hash::check($password, $this->password);
     }
 
+    public function getClient($params = ['password_client' => true])
+    {
+        return \Laravel\Passport\Client::where($params)->first();
+    }
+
     /**
      * @return mixed
      */
@@ -43,19 +47,43 @@ trait LaravelPassportTrait
     {
         $http = new Client;
 
-        $passportClient = \Laravel\Passport\Client::where('password', true)->first();
+        $passportClient = $this->getClient();
 
         $response = $http->post(url('oauth/token'), [
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => $passportClient->id,
                 'client_secret' => $passportClient->secret,
-                'username' => 'username',
-                'password' => 'my-password',
+                'username' => $this->email,
+                'password' => $this->password,
                 'scope' => '',
             ],
         ]);
 
         return json_decode((string)$response->getBody(), true);
     }
+
+    /**
+     * Creates a new expiring token using the user refresh token.
+     *
+     * @return mixed
+     */
+    public function refreshToken()
+    {
+        $http = new Client;
+
+        $passportClient = $this->getClient();
+
+        $response = $http->post(url('oauth/token'), [
+            'form_params' => [
+                'grant_type' => 'refresh_token',
+                'client_id' => $passportClient->id,
+                'client_secret' => $passportClient->secret,
+                'refresh_token' => request()->header('refresh_token'),
+            ],
+        ]);
+
+        return json_decode((string)$response->getBody(), true);
+    }
+
 }

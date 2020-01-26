@@ -2,7 +2,9 @@
 
 namespace Quadram\LaravelPassport\Test\Unit;
 
+use Illuminate\Support\Facades\DB;
 use Laravel\Passport\Client;
+use Quadram\LaravelPassport\Models\User;
 use Quadram\LaravelPassport\Test\TestCase;
 
 class PassportUnitTest extends TestCase
@@ -22,4 +24,11 @@ class PassportUnitTest extends TestCase
         $this->assertEquals(2, $passportClient->id);
     }
 
+    /** @test */
+    public function user_is_created()
+    {
+        $user = User::create(['email' => 'email@test.com', 'password' => 'secret']);
+
+        $this->assertNotNull($user);
+    }
 }
