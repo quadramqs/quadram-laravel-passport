@@ -15,5 +15,25 @@
     "minimum-stability": "dev",
     "require": {
         "laravel/passport": "^9.0@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quadram\\LaravelPassport\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Quadram\\LaravelPassport\\Test\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Quadram\\LaravelPassport\\Providers\\LaravelPassportServiceProvider"
+            ],
+            "aliases": {
+                "LaravelPassport": "Quadram\\LaravelPassport\\Facade"
+            }
+        }
     }
 }
