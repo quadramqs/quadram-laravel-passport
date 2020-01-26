@@ -29,6 +29,8 @@ class InstallCommand extends Command
     {
         $this->call('passport:install', ['--force' => true]);
 
-        $this->info('Passsport installed');
+        $this->call('vendor:publish', ['--tag' => 'passport-components']);
+
+        $this->info('Passport installed');
     }
 }

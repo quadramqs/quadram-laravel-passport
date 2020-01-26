@@ -26,6 +26,15 @@ class LaravelPassportAuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
+
+        // The token is returned to the client without exchanging an authorization code
+        Passport::enableImplicitGrant();
+
+        Passport::tokensExpireIn(now()->addDays(1));
+
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
     }
 
 

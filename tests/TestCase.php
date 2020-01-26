@@ -2,11 +2,15 @@
 
 namespace Quadram\LaravelPassport\Test;
 
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Quadram\LaravelPassport\Providers\LaravelPassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    use DatabaseMigrations;
+
+    protected $setUpHasRunOnce = false;
 
     /**
      * Setup the test environment.
@@ -15,8 +19,17 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-        $this->clearCache();
+        if (!$this->setUpHasRunOnce) {
+            $this->clearCache();
 
+            $this->runMigrations();
+
+            $this->setUpHasRunOnce = true;
+        }
+    }
+
+    public function runMigrations()
+    {
         // Run initial migrations
         $this->artisan('migrate',
             ['--database' => 'testbench'])->run();
@@ -25,7 +38,11 @@ abstract class TestCase extends Orchestra
         $this->artisan('vendor:publish', ['--provider' => LaravelPassportServiceProvider::class]);
 
         // Publish Passport Migrations
-        $this->artisan('vendor:publish', ['--tag' => 'passport-migrations']);
+        // $this->artisan('vendor:publish', ['--tag' => 'passport-migrations']);
+
+        // Install Passport
+        $this->artisan('quadram:laravel-passport-install');
+
     }
 
     public function clearCache()
