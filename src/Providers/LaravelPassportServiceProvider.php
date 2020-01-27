@@ -40,8 +40,8 @@ class LaravelPassportServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->publishes([
-            __DIR__ . '/../../src/config/laravelpassport.php' => config_path('laravelpassport.php'),
-        ]);
+//        $this->publishes([
+//            __DIR__ . '/../../src/config/laravelpassport.php' => config_path('laravelpassport.php'),
+//        ]);
     }
 }

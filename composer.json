@@ -29,12 +29,9 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Laravel\\Passport\\PassportServiceProvider",
-                "Laravel\\Passport\\LaravelPassportAuthServiceProvider"
-            ],
-            "aliases": {
-                "LaravelPassport": "Quadram\\LaravelPassport\\Facade"
-            }
+                "Quadram\\LaravelPassport\\Providers\\LaravelPassportServiceProvider",
+                "Quadram\\LaravelPassport\\Providers\\LaravelPassportAuthServiceProvider"
+            ]
         }
     },
     "config": {

@@ -19,30 +19,28 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-//        if (!$this->setUpHasRunOnce) {
+        if (!$this->setUpHasRunOnce) {
             $this->clearCache();
 
             $this->runMigrations();
 
             $this->setUpHasRunOnce = true;
-//        }
+        }
     }
 
     public function runMigrations()
     {
         // Run initial migrations
-        $this->artisan('migrate',
-            ['--database' => 'testbench'])->run();
+        $this->artisan('migrate', ['--database' => 'testbench','--path'=>'migrations']);
 
         // Publish config files
-        $this->artisan('vendor:publish', ['--provider' => LaravelPassportServiceProvider::class]);
+//        $this->artisan('vendor:publish', ['--provider' => LaravelPassportServiceProvider::class]);
 
         // Publish Passport Migrations
         // $this->artisan('vendor:publish', ['--tag' => 'passport-migrations']);
 
         // Install Passport
         $this->artisan('quadram:laravel-passport-install');
-
     }
 
     public function clearCache()

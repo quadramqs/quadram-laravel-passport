@@ -2,8 +2,12 @@
 
 namespace Quadram\LaravelPassport\Test\Unit;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Routing\Registrar;
+use Laminas\Diactoros\Response as Psr7Response;
 use Laravel\Passport\Client;
+use Laravel\Passport\Http\Controllers\AccessTokenController;
+use Laravel\Passport\Http\Middleware\CheckClientCredentials;
+use Laravel\Passport\Passport;
 use Quadram\LaravelPassport\Models\User;
 use Quadram\LaravelPassport\Test\TestCase;
 
@@ -11,24 +15,42 @@ class PassportUnitTest extends TestCase
 {
 
     /** @test */
-    public function migrations_must_be_created_after_install_command()
+    public function clients_must_be_created()
     {
-        $this->assertEquals(2, Client::count());
+        $this->assertNotNull(Client::where('password_client', true)->first());
+        $this->assertNotNull(Client::where('personal_access_client', true)->first());
     }
 
     /** @test */
-    public function function_must_return_first_password_client()
+    public function user_with_trait_can_generate_a_token()
     {
-        $passportClient = Client::where('password_client', true)->first();
-
-        $this->assertEquals(2, $passportClient->id);
-    }
-
-    /** @test */
-    public function user_is_created()
-    {
-        $user = User::create(['email' => 'email@test.com', 'password' => 'secret']);
+        /** @var User $user */
+        $user = User::create([
+            'name' => 'Test user',
+            'email' => 'email@test.com',
+            'password' => 'secret'
+        ]);
 
         $this->assertNotNull($user);
+
+//        $user->createExpiringToken();
+//        $this->assertNotNull($user->token);
+
+
+        $this->withoutExceptionHandling();
+
+        /** @var Registrar $router */
+
+        $response = $this->get('/oauth');
+
+        $this->assertNotNull($response);
+
+        dd($response);
+
+        Passport::actingAsClient(new Client());
+
+        $response = $this->get('/foo');
+        $response->assertSuccessful();
+        $response->assertSee('bar');
     }
 }

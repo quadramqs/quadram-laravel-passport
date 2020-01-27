@@ -6,6 +6,7 @@ namespace Quadram\LaravelPassport\Traits;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
+use Laravel\Passport\Http\Controllers\AccessTokenController;
 
 trait LaravelPassportTrait
 {
