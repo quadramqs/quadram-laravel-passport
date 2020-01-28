@@ -5,15 +5,39 @@ namespace Quadram\LaravelPassport\Traits;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
-use Laravel\Passport\Http\Controllers\AccessTokenController;
 
 trait LaravelPassportTrait
 {
     use HasApiTokens;
 
     public $authorization;
+
+    /**
+     * @return string
+     */
+    public function getFindForPassportField()
+    {
+        return $this->passportUsername ?? 'email';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValidateForPassportPasswordGrantField()
+    {
+        $passwordField = $this->passportPassword ?? 'password';
+
+        return $this->{$passwordField};
+    }
+
+    /**
+     * @return bool
+     */
+    public function passwordFieldMustBeHashed()
+    {
+        return !!$this->passportPasswordCheck;
+    }
 
     /**
      * Find the user instance for the given username.
@@ -23,7 +47,7 @@ trait LaravelPassportTrait
      */
     public function findForPassport($username)
     {
-        return $this->where($this->passportUsername ?? 'email', $username)->first();
+        return $this->where($this->getFindForPassportField(), $username)->first();
     }
 
     /**
@@ -34,14 +58,11 @@ trait LaravelPassportTrait
      */
     public function validateForPassportPasswordGrant($password)
     {
-        $hashCheck = !!$this->passportPasswordCheck;
-        $passwordField = $this->passportPassword ?? 'password';
-
-        if($hashCheck) {
-            return Hash::check($password, $this->{$passwordField});
+        if(!!$this->passwordFieldMustBeHashed()) {
+            return Hash::check($password, $this->getValidateForPassportPasswordGrantField());
         }
 
-        return $password === $this->{$passwordField};
+        return $password === $this->getValidateForPassportPasswordGrantField();
     }
 
     public function getClient($params = ['password_client' => true])
