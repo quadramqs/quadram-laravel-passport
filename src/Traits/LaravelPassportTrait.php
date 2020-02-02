@@ -11,8 +11,6 @@ trait LaravelPassportTrait
 {
     use HasApiTokens;
 
-    public $authorization;
-
     /**
      * @return string
      */
@@ -58,7 +56,7 @@ trait LaravelPassportTrait
      */
     public function validateForPassportPasswordGrant($password)
     {
-        if(!!$this->passwordFieldMustBeHashed()) {
+        if($this->passwordFieldMustBeHashed()) {
             return Hash::check($password, $this->getValidateForPassportPasswordGrantField());
         }
 
@@ -90,7 +88,7 @@ trait LaravelPassportTrait
             ],
         ]);
 
-        return json_decode((string)$response->getBody(), true);
+        $this->authorization = json_decode((string)$response->getBody(), true);
     }
 
     /**
@@ -113,7 +111,7 @@ trait LaravelPassportTrait
             ],
         ]);
 
-        return json_decode((string)$response->getBody(), true);
+        $this->authorization = json_decode((string)$response->getBody(), true);
     }
 
 }

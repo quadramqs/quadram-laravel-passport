@@ -3,6 +3,7 @@
 namespace Quadram\LaravelPassport\Test;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Laravel\Passport\PassportServiceProvider;
 use Quadram\LaravelPassport\Providers\LaravelPassportServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -59,7 +60,10 @@ abstract class TestCase extends Orchestra
      */
     protected function getPackageProviders($app)
     {
-        return [LaravelPassportServiceProvider::class];
+        return [
+            LaravelPassportServiceProvider::class,
+            PassportServiceProvider::class,
+        ];
     }
 
     /**

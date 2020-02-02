@@ -2,12 +2,7 @@
 
 namespace Quadram\LaravelPassport\Test\Unit;
 
-use Illuminate\Contracts\Routing\Registrar;
-use Laminas\Diactoros\Response as Psr7Response;
 use Laravel\Passport\Client;
-use Laravel\Passport\Http\Controllers\AccessTokenController;
-use Laravel\Passport\Http\Middleware\CheckClientCredentials;
-use Laravel\Passport\Passport;
 use Quadram\LaravelPassport\Models\User;
 use Quadram\LaravelPassport\Test\TestCase;
 
@@ -22,35 +17,49 @@ class PassportUnitTest extends TestCase
     }
 
     /** @test */
-    public function user_with_trait_can_generate_a_token()
+    public function user_trait_must_use_default_fields()
     {
         /** @var User $user */
         $user = User::create([
             'name' => 'Test user',
             'email' => 'email@test.com',
-            'password' => 'secret'
+            'password' => 'secret',
         ]);
 
-        $this->assertNotNull($user);
+        self::assertEquals('email', $user->getFindForPassportField());
+        self::assertEquals($user->password, $user->getValidateForPassportPasswordGrantField());
+        self::assertFalse($user->passwordFieldMustBeHashed());
+    }
 
-//        $user->createExpiringToken();
-//        $this->assertNotNull($user->token);
+    /** @test */
+    public function user_trait_can_use_custom_fields()
+    {
+        /** @var User $user */
+        $user = User::create([
+            'name' => 'Test user',
+            'email' => 'email@test.com',
+            'password' => 'secret',
+        ]);
 
+        $user->passportUsername = 'test_name';
+        $user->passportPassword = 'passportPassword';
+        $user->passportPasswordCheck = true;
 
-        $this->withoutExceptionHandling();
+        self::assertEquals($user->passportUsername, $user->getFindForPassportField());
+        self::assertEquals($user->passportPassword, $user->getValidateForPassportPasswordGrantField());
+        self::assertTrue($user->passwordFieldMustBeHashed());
+    }
 
-        /** @var Registrar $router */
+    /** @test */
+    public function must_return_first_password_client()
+    {
+        /** @var User $user */
+        $user = User::create([
+            'name' => 'Test user',
+            'email' => 'email@test.com',
+            'password' => 'secret',
+        ]);
 
-        $response = $this->get('/oauth');
-
-        $this->assertNotNull($response);
-
-        dd($response);
-
-        Passport::actingAsClient(new Client());
-
-        $response = $this->get('/foo');
-        $response->assertSuccessful();
-        $response->assertSee('bar');
+        self::assertNotNull($user->getClient());
     }
 }
