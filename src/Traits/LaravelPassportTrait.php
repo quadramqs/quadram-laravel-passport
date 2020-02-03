@@ -1,117 +1,125 @@
 <?php
 
-
 namespace Quadram\LaravelPassport\Traits;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\User;
 use Laravel\Passport\HasApiTokens;
 
 trait LaravelPassportTrait
 {
     use HasApiTokens;
 
-    /**
-     * @return string
-     */
-    public function getFindForPassportField()
-    {
-        return $this->passportUsername ?? 'email';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getValidateForPassportPasswordGrantField()
-    {
-        $passwordField = $this->passportPassword ?? 'password';
-
-        return $this->{$passwordField};
-    }
-
-    /**
-     * @return bool
-     */
-    public function passwordFieldMustBeHashed()
-    {
-        return !!$this->passportPasswordCheck;
-    }
+    public $authorization = [];
 
     /**
      * Find the user instance for the given username.
      *
-     * @param string $username
-     * @return \App\User
+     * @param int $id
+     * @return User
      */
-    public function findForPassport($username)
+    public function findForPassport($id)
     {
-        return $this->where($this->getFindForPassportField(), $username)->first();
+        return $this->find($id);
     }
 
     /**
-     * Validate the password of the user for the Passport password grant.
+     * Auto validates the user cause we already have an instance of the user
      *
      * @param string $password
      * @return bool
      */
     public function validateForPassportPasswordGrant($password)
     {
-        if($this->passwordFieldMustBeHashed()) {
-            return Hash::check($password, $this->getValidateForPassportPasswordGrantField());
-        }
-
-        return $password === $this->getValidateForPassportPasswordGrantField();
+        return true;
     }
 
+    /**
+     * Return the Passport client
+     *
+     * @param array $params
+     * @return mixed
+     */
     public function getClient($params = ['password_client' => true])
     {
         return \Laravel\Passport\Client::where($params)->first();
     }
 
     /**
-     * @return mixed
+     * Make a post call to oauth/token endpoint and save the authorization in the user instance
+     *
+     * @param $params
      */
-    public function createExpiringToken()
+    public function postAuthorization($params)
     {
-        $http = new Client;
-
         $passportClient = $this->getClient();
 
+        $clientParams = [
+            'client_id' => $passportClient->id,
+            'client_secret' => $passportClient->secret
+        ];
+
+        $http = new Client;
+
         $response = $http->post(url('oauth/token'), [
-            'form_params' => [
-                'grant_type' => 'password',
-                'client_id' => $passportClient->id,
-                'client_secret' => $passportClient->secret,
-                'username' => $this->email,
-                'password' => $this->password,
-                'scope' => '',
-            ],
+            'form_params' => array_merge($clientParams, $params)
         ]);
 
-        $this->authorization = json_decode((string)$response->getBody(), true);
+        $this->setAuthorization(json_decode((string)$response->getBody(), true));
     }
 
     /**
-     * Creates a new expiring token using the user refresh token.
+     * Update the user instance with an authorization array
      *
-     * @return mixed
+     * @param $authorization
      */
-    public function refreshToken()
+    public function setAuthorization($authorization)
     {
-        $http = new Client;
+        $this->authorization = [
+            'accessToken' => $authorization->access_token ?? $authorization->accessToken ?? null,
+            'refreshToken' => $authorization->refresh_token ?? null,
+            'expires' => $authorization->expires_in ?? null,
+        ];
+    }
 
-        $passportClient = $this->getClient();
-
-        $response = $http->post(url('oauth/token'), [
-            'form_params' => [
-                'grant_type' => 'refresh_token',
-                'client_id' => $passportClient->id,
-                'client_secret' => $passportClient->secret,
-                'refresh_token' => request()->header('refresh_token'),
-            ],
+    /**
+     * Create a new expiring token for the current user
+     *
+     * @param string $scope
+     */
+    public function createExpiringToken($scope = '*')
+    {
+        $this->postAuthorization([
+            'grant_type' => 'password',
+            'username' => $this->id,
+            'password' => null,
+            'scope' => $scope,
         ]);
+    }
 
-        $this->authorization = json_decode((string)$response->getBody(), true);
+    /**
+     * Creates a new expiring token using the user's refresh token.
+     *
+     * @param $refreshToken
+     */
+    public function refreshToken($refreshToken)
+    {
+        $this->postAuthorization([
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken,
+        ]);
+    }
+
+    /**
+     * Creates a new personal access token with the default expiration date
+     *
+     * @param string $name
+     */
+    public function createNoExpiringToken($name = 'Personal Access Token')
+    {
+        $jwt = $this->createToken($name);
+
+        $this->setAuthorization($jwt);
     }
 
 }
