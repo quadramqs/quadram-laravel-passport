@@ -87,7 +87,7 @@ trait LaravelPassportTrait
      *
      * @param string $scope
      */
-    public function createExpiringToken($scope = '*')
+    public function createAccessToken($scope = '*')
     {
         $this->postAuthorization([
             'grant_type' => 'password',
@@ -115,7 +115,7 @@ trait LaravelPassportTrait
      *
      * @param string $name
      */
-    public function createNoExpiringToken($name = 'Personal Access Token')
+    public function createPersonalToken($name = 'Personal Access Token')
     {
         $jwt = $this->createToken($name);
 

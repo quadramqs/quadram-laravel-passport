@@ -39,7 +39,7 @@ class PassportUnitTest extends TestCase
             'password' => 'secret',
         ]);
 
-        $user->createNoExpiringToken();
+        $user->createPersonalToken();
 
         self::assertNotNull($user->authorization['accessToken']);
     }
