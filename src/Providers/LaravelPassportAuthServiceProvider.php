@@ -5,6 +5,10 @@ namespace Quadram\LaravelPassport\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
 
+const DAY_MINUTES = 60 * 24;
+const MONTH_MINUTES = DAY_MINUTES * 30;
+const YEAR_MINUTES = MONTH_MINUTES * 12;
+
 class LaravelPassportAuthServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +27,10 @@ class LaravelPassportAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $tokenExpiresInMinutes = env('TOKEN_EXPIRES_IN_MINUTES', DAY_MINUTES);
+        $refreshTokenExpiresInMinutes = env('REFRESH_TOKEN_EXPIRES_IN_MINUTES', MONTH_MINUTES);
+        $personalTokenExpiresInMinutes = env('PERSONAL_TOKEN_EXPIRES_IN_MINUTES', YEAR_MINUTES * 100);
+
         $this->registerPolicies();
 
         Passport::routes();
@@ -30,11 +38,14 @@ class LaravelPassportAuthServiceProvider extends ServiceProvider
         // The token is returned to the client without exchanging an authorization code
         Passport::enableImplicitGrant();
 
-        Passport::tokensExpireIn(now()->addDays(1));
+        // Token expires in 1 day
+        Passport::tokensExpireIn(now()->addMinutes($tokenExpiresInMinutes));
 
-        Passport::refreshTokensExpireIn(now()->addDays(30));
+        // Refresh Token expires in 30 day
+        Passport::refreshTokensExpireIn(now()->addMinutes($refreshTokenExpiresInMinutes));
 
-        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        // Personal Token expires in 100 years
+        Passport::personalAccessTokensExpireIn(now()->addMinutes($personalTokenExpiresInMinutes));
     }
 
 
