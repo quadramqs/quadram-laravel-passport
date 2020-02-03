@@ -1,4 +1,4 @@
-<p align="center"><img src="https://www.quadram.mobi/img/quadram-desarrollo-aplicaciones-moviles-android-iphone-2.png" width="200"></p>
+<p><img src="https://www.quadram.mobi/img/quadram-desarrollo-aplicaciones-moviles-android-iphone-2.png" width="200"></p>
 
 [visit our website](https://www.quadram.mobi/)
 
