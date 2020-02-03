@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Quadram\LaravelPassport\Models;
 
 use Illuminate\Auth\Authenticatable;

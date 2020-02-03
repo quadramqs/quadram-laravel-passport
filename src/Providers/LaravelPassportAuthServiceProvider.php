@@ -48,7 +48,6 @@ class LaravelPassportAuthServiceProvider extends ServiceProvider
         Passport::personalAccessTokensExpireIn(now()->addMinutes($personalTokenExpiresInMinutes));
     }
 
-
     /**
      * Register the service provider.
      *
