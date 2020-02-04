@@ -65,7 +65,9 @@ trait LaravelPassportTrait
             'form_params' => array_merge($clientParams, $params)
         ]);
 
-        $this->setAuthorization(json_decode((string)$response->getBody(), true));
+        $jwt = json_decode((string)$response->getBody());
+
+        $this->setAuthorization($jwt);
     }
 
     /**
@@ -92,7 +94,7 @@ trait LaravelPassportTrait
         $this->postAuthorization([
             'grant_type' => 'password',
             'username' => $this->id,
-            'password' => null,
+            'password' => $this->password,
             'scope' => $scope,
         ]);
     }
