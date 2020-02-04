@@ -12,7 +12,7 @@ This library install Laravel Passport library and allow to issue access tokens f
     composer require quadram/laravel-passport
     
     # install and configure library
-    php artisan quadram:laravel-passport
+    php artisan quadram:laravel-passport-install
     
 ## How to use
 
@@ -39,7 +39,7 @@ These calls add a new authorization field to the user instance with this structu
         accessToken = [
             'accessToken' => '....',
             'refreshToken' => '....',
-            'expiresIn' => 123456...
+            'expires' => 123456...
         ];
     
 *** remember to make visible this authorization field and send it along your user instance. 
