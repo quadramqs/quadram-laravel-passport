@@ -42,7 +42,29 @@ These calls add a new authorization field to the user instance with this structu
             'expires' => 123456...
         ];
     
-*** remember to make visible this authorization field and send it along your user instance. 
+## Testing
+
+When you are testing your routes to issue tokens using phpunit the Trait will respond with a test token without calling the actual oauth route provided by Passport.
+
+If you want to test any passport related feature you should pass an Authorization header to your route.
+ 
+Also the trait will use the auth user for updating and deleting tokens so remember to use "Passport::actingAs" to avoid errors.
+
+        $user = factory(User::class)->create();
+        $user->createAccessToken();
+
+        Passport::actingAs($user);
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $user->authorization['accessToken']
+        ];
+
+        $this->withHeaders($headers)
+            ->json('put', '/api/sessions', ['refreshToken' => $user->authorization['refreshToken']])
+            ->assertStatus(200)
+            ->assertsee('authorization')
+            ->assertsee('accessToken')
+            ->assertsee('refreshToken');
     
 ## Environment values
 
