@@ -79,6 +79,9 @@ The default expiration times for each token can be configured using the .env fil
     # Default expiration time for personal tokens in minutes, default = 60 * 24 * 30 * 12 * 100 -> 1 year
     # PERSONAL_TOKEN_EXPIRES_IN_MINUTES
     
+    # Curl should verify SSL certificate when calling the server (default = false)
+    # PASSPORT_CURL_VERIFY_SSL
+    
 Todo Tasks
 
 - [x] Basic trait to issue tokens.

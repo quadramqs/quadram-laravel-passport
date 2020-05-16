@@ -71,7 +71,7 @@ trait LaravelPassportTrait
             'client_secret' => $passportClient->secret
         ];
 
-        $http = new Client;
+        $http = new Client(['verify' => env('PASSPORT_CURL_VERIFY_SSL', false)]);
 
         $response = $http->post(url('oauth/token'), [
             'form_params' => array_merge($clientParams, $params)
