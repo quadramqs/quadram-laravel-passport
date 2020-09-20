@@ -4,6 +4,7 @@ namespace Quadram\LaravelPassport\Traits;
 
 use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 use Laravel\Passport\Token;
 use Lcobucci\JWT\Parser;
@@ -71,15 +72,11 @@ trait LaravelPassportTrait
             'client_secret' => $passportClient->secret
         ];
 
-        $http = new Client(['verify' => env('PASSPORT_CURL_VERIFY_SSL', false)]);
+        $request = Request::create(url('oauth/token'), 'POST', array_merge($clientParams, $params));
 
-        $response = $http->post(url('oauth/token'), [
-            'form_params' => array_merge($clientParams, $params)
-        ]);
+        $response = app()->handle($request);
 
-        $jwt = json_decode((string)$response->getBody());
-
-        $this->setAuthorization($jwt);
+        $this->setAuthorization(json_decode($response->getContent()));
     }
 
     /**
