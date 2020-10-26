@@ -2,12 +2,12 @@
 
 namespace Quadram\LaravelPassport\Traits;
 
-use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Laravel\Passport\HasApiTokens;
 use Laravel\Passport\Token;
 use Lcobucci\JWT\Parser;
+use League\OAuth2\Server\Exception\OAuthServerException;
 
 trait LaravelPassportTrait
 {
@@ -76,7 +76,13 @@ trait LaravelPassportTrait
 
         $response = app()->handle($request);
 
-        $this->setAuthorization(json_decode($response->getContent()));
+        $json = json_decode($response->getContent());
+
+        if ($response->getStatusCode() === 401) {
+            throw new OAuthServerException($json->message, 1, $json->error_description, 401, $json->hint);
+        }
+
+        $this->setAuthorization($json);
     }
 
     /**
@@ -192,5 +198,4 @@ trait LaravelPassportTrait
 
         $token->revoke();
     }
-
 }
