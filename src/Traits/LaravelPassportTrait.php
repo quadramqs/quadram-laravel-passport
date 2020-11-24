@@ -118,14 +118,15 @@ trait LaravelPassportTrait
     /**
      * Create a new expiring token for the current user
      *
+     * @param null $passwordField
      * @param string $scope
      */
-    public function createAccessToken($scope = '*')
+    public function createAccessToken($passwordField = null, $scope = '*')
     {
         $this->postAuthorization([
             'grant_type' => 'password',
             'username' => $this->id,
-            'password' => $this->password,
+            'password' => $passwordField ? $this->id : $this->password,
             'scope' => $scope,
         ]);
     }
